@@ -36,10 +36,6 @@ func doSomething(s []byte) {
 	}
 }
 
-
-func () {
-
-}
 func LocalTz() *time.Location {
 	tz, _ := time.LoadLocation("Asia/Shanghai")
 	return tz
