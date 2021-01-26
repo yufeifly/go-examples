@@ -2,6 +2,7 @@ package httpget
 
 import (
 	"fmt"
+	"github.com/sirupsen/logrus"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -29,6 +30,9 @@ func GetWithParams() {
 	urlPath := req.URL.String()
 	fmt.Println(urlPath) // https://httpbin.org/get?age=23&name=zhaofan
 	resp, err := http.Get(urlPath)
+	if err != nil {
+		logrus.Error(err)
+	}
 	defer resp.Body.Close()
 	body, _ := ioutil.ReadAll(resp.Body)
 	fmt.Println(string(body))
