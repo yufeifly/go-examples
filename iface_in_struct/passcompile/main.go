@@ -22,7 +22,7 @@ func (p *person) work() {
 }
 
 func main() {
-	p := &person{} // its members will be init by default
+	p := &person{} // its members will be init by default. Its worker interface is nil.
 	p.worker = &person{
 		name:   "yufei",
 		worker: nil,
