@@ -3,48 +3,70 @@ package main
 import (
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net"
 	"os"
+	"path/filepath"
+	"strconv"
+	"sync"
+	"time"
 )
 
 func main() {
 	//获取命令行参数,用命令传递文件go run send.go D:\1.mp3,参数为1:send.go,2:D:\1.mp3
 	list := os.Args
 	//文件路径
-	filepath := list[1]
-	//文件属性
-	fileInfo, err := os.Stat(filepath)
-	if err != nil {
-		fmt.Println("os.Stat err", err)
-		return
+	filedir := list[1]
+	files, _ := ioutil.ReadDir(filedir)
+	var filenames []string
+	for _, f := range files {
+		filenames = append(filenames, f.Name())
 	}
-	filename := fileInfo.Name()
-	/**
+	start := time.Now()
+	/*
 	  建立连接
 	*/
-	conn, err := net.Dial("tcp", "127.0.0.1:8003")
-	if err != nil {
-		fmt.Println("net.Dialt err", err)
-		return
+	baseAddr := "192.168.134.135"
+	goroutines := 20
+	var wg sync.WaitGroup
+	for i := 0; i < goroutines; i++ {
+		filename := filenames[i]
+		port := 10000 + i
+		addr := baseAddr + ":" + strconv.Itoa(port)
+		wg.Add(1)
+		go func() {
+			t1 := time.Now()
+			conn, err := net.Dial("tcp", addr)
+			if err != nil {
+				fmt.Println("net.Dialt err", err)
+				return
+			}
+			//发送文件名到接收端
+			_, err = conn.Write([]byte(filename))
+			if err != nil {
+				fmt.Println("conn.Write err", err)
+				return
+			}
+			buf := make([]byte, 4096)
+			//接收服务器返还的指令
+			n, err := conn.Read(buf)
+			if err != nil {
+				fmt.Println("conn.Read err", err)
+				return
+			}
+			//返回ok，可以传输文件
+			if string(buf[:n]) == "ok" {
+				filename = filepath.Join(filedir, filename)
+				sendFile(conn, filename)
+			}
+			t2 := time.Since(t1)
+			fmt.Printf("single transfer time is: %v\n", t2)
+			wg.Done()
+		}()
 	}
-	//发送文件名到接收端
-	_, err = conn.Write([]byte(filename))
-	if err != nil {
-		fmt.Println("conn.Write err", err)
-		return
-	}
-	buf := make([]byte, 4096)
-	//接收服务器返还的指令
-	n, err := conn.Read(buf)
-	if err != nil {
-		fmt.Println("conn.Read err", err)
-		return
-	}
-	//返回ok，可以传输文件
-	if string(buf[:n]) == "ok" {
-		sendFile(conn, filepath)
-	}
-
+	wg.Wait()
+	ed := time.Since(start)
+	fmt.Printf("total elapsed time: %v\n", ed)
 }
 func sendFile(conn net.Conn, filepath string) {
 	//打开要传输的文件
