@@ -24,7 +24,7 @@ func DeleteExtraSpace(s string) string {
 	return string(s2)
 }
 
-func adjustName(Names string) string {
+func adjustNameForGBT(Names string) string {
 	names := strings.Split(Names, ",")
 	var newNames []string
 	for i, p := range names {
@@ -72,16 +72,30 @@ func xprint(names []string) {
 	}
 }
 
-func adjustName2(Names string) string {
+func dealName(name string) string {
+	var output string
+	for _, ch := range name {
+		if ch == ' ' {
+			continue
+		}
+		if ch == '.' {
+			ch = ','
+		}
+		output += string(ch)
+	}
+	return output
+}
+
+func adjustNameForAPA(Names string) string {
 	Names = deleteAnd(Names)
 	names := strings.Split(Names, ".,")
-	//xprint(names)
 	var newNames []string
 	for i, p := range names {
 		names[i] = strings.TrimSpace(p)
 		names[i] = DeleteExtraSpace(names[i])
-		pieces := strings.Split(names[i], ", ")
-		xprint(pieces)
+		names[i] = dealName(names[i])
+		pieces := strings.Split(names[i], ",")
+		//xprint(pieces)
 		s := 0
 		t := len(pieces) - 1
 		for s < t {
@@ -125,6 +139,6 @@ func main() {
 		if c == io.EOF {
 			break
 		}
-		fmt.Println(adjustName2(string(a)))
+		fmt.Println(adjustNameForGBT(string(a)))
 	}
 }
