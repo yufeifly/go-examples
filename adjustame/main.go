@@ -1,39 +1,60 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
+	"io"
+	"os"
 	"strings"
 )
 
-func adjustName(Names []string) {
-	for _, rawName := range Names {
-		names := strings.Split(rawName, ",")
-		for i, p := range names {
-			names[i] = strings.TrimSpace(p)
-			pieces := strings.Split(names[i], " ")
-			s := 0
-			t := len(pieces) - 1
-			for s < t {
-				pieces[s], pieces[t] = pieces[t], pieces[s]
-				s++
-				t--
-			}
-			for ind := range pieces {
-				pieces[ind] += "."
-			}
-			var newName string
-			for _, piece := range pieces {
-				newName += piece
-			}
-			fmt.Println(newName)
+func adjustName(Names string) string {
+	names := strings.Split(Names, ",")
+	var newNames []string
+	for i, p := range names {
+		names[i] = strings.TrimSpace(p)
+		pieces := strings.Split(names[i], " ")
+		s := 0
+		t := len(pieces) - 1
+		for s < t {
+			pieces[s], pieces[t] = pieces[t], pieces[s]
+			s++
+			t--
 		}
-
+		for ind := range pieces[:len(pieces)-1] {
+			pieces[ind] += "."
+		}
+		var newName string
+		for _, piece := range pieces[:len(pieces)-1] {
+			newName += piece + " "
+		}
+		newName += pieces[len(pieces)-1]
+		newNames = append(newNames, newName)
 	}
+	var outputNames string
+	for _, newN := range newNames[:len(newNames)-1] {
+		outputNames += newN + ", "
+	}
+	if newNames != nil {
+		outputNames += newNames[len(newNames)-1]
+	}
+	return outputNames
 }
 
 func main() {
-	names := []string{
-		"Puliafito C, Vallati C, Mingozzi E",
+	fi, err := os.Open("names.txt")
+	if err != nil {
+		fmt.Printf("Error: %s\n", err)
+		return
 	}
-	adjustName(names)
+	defer fi.Close()
+
+	br := bufio.NewReader(fi)
+	for {
+		a, _, c := br.ReadLine()
+		if c == io.EOF {
+			break
+		}
+		fmt.Println(adjustName(string(a)))
+	}
 }
