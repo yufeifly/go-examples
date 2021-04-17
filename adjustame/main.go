@@ -89,9 +89,14 @@ func dealName(name string) string {
 func adjustNameForAPA(Names string) string {
 	Names = deleteAnd(Names)
 	names := strings.Split(Names, ".,")
+	flag := false
+	if len(names) > 6 {
+		names = names[:6]
+		flag = true
+	}
 	var newNames []string
-	for i, p := range names {
-		names[i] = strings.TrimSpace(p)
+	for i := range names {
+		//names[i] = strings.TrimSpace(p)
 		names[i] = DeleteExtraSpace(names[i])
 		names[i] = dealName(names[i])
 		pieces := strings.Split(names[i], ",")
@@ -122,6 +127,9 @@ func adjustNameForAPA(Names string) string {
 	if newNames != nil {
 		outputNames += newNames[len(newNames)-1]
 	}
+	if flag == true {
+		outputNames += ", et al"
+	}
 	return outputNames
 }
 
@@ -139,6 +147,6 @@ func main() {
 		if c == io.EOF {
 			break
 		}
-		fmt.Println(adjustNameForGBT(string(a)))
+		fmt.Println(adjustNameForAPA(string(a)))
 	}
 }
