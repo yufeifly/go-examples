@@ -1,6 +1,6 @@
 package main
 
-import "github.com/yufeifly/go-examples/httpthings/httpget"
+import "github.com/yufeifly/go-examples/xhttp/httpget"
 
 func main() {
 	httpget.GetWithParams()

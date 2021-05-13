@@ -96,11 +96,9 @@ func adjustNameForAPA(Names string) string {
 	}
 	var newNames []string
 	for i := range names {
-		//names[i] = strings.TrimSpace(p)
 		names[i] = DeleteExtraSpace(names[i])
 		names[i] = dealName(names[i])
 		pieces := strings.Split(names[i], ",")
-		//xprint(pieces)
 		s := 0
 		t := len(pieces) - 1
 		for s < t {
@@ -119,7 +117,6 @@ func adjustNameForAPA(Names string) string {
 		newName += pieces[len(pieces)-1]
 		newNames = append(newNames, newName)
 	}
-	//xprint(newNames)
 	var outputNames string
 	for _, newN := range newNames[:len(newNames)-1] {
 		outputNames += newN + ", "
