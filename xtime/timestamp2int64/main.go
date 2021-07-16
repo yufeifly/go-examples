@@ -21,7 +21,12 @@ func main() {
 	if err != nil {
 		fmt.Println(err)
 	}
-	tm2, _ := time.ParseInLocation("2006-01-02 15:04", "2020-10-13 13:55", loc)
+
+	tm2, err := time.ParseInLocation("2006-01-02 15:04", "2020-10-13 13:55", loc)
+	if err != nil {
+		fmt.Println(err)
+	}
+
 	tm3 := tm2.Unix()
 	fmt.Println(tm3)
 	tm4 := time.Unix(tm3, 0)
